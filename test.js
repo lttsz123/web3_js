@@ -47,7 +47,7 @@ async function claimFaucet(address) {
     try {
         const response = await axios.get(`${FAUCET_URL}${address}`, {
             headers: {
-                'User-Agent': "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36",
+                'User-Agent': getRandomUserAgent(),
                 "authority": "faucet.testnet-1.testnet.allora.network",
                 "method": "GET",
                 "path": "/send/allora-testnet-1/fsdfsdf",
@@ -57,9 +57,7 @@ async function claimFaucet(address) {
                 "Accept-Language": "zh-CN,zh;q=0.9",
                 "Priority": "u=1, i",
                 "Referer": "https://faucet.testnet-1.testnet.allora.network/",
-                "Sec-Ch-Ua": "\"Not/A)Brand\";v=\"8\", \"Chromium\";v=\"126\", \"Google Chrome\";v=\"126\"",
-                "Sec-Ch-Ua-Mobile": "?0",
-                "Sec-Ch-Ua-Platform": "\"Windows\"",
+
                 "Sec-Fetch-Dest": "empty",
                 "Sec-Fetch-Mode": "cors",
                 "Sec-Fetch-Site": "same-origin"

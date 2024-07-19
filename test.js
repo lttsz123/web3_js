@@ -47,17 +47,31 @@ async function claimFaucet(address) {
     try {
         const response = await axios.get(`${FAUCET_URL}${address}`, {
             headers: {
-                'User-Agent': getRandomUserAgent()
+                'User-Agent': "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36",
+                "authority": "faucet.testnet-1.testnet.allora.network",
+                "method": "GET",
+                "path": "/send/allora-testnet-1/fsdfsdf",
+                "scheme": "https",
+                "Accept": "*/*",
+                "Accept-Encoding": "gzip, deflate, br, zstd",
+                "Accept-Language": "zh-CN,zh;q=0.9",
+                "Priority": "u=1, i",
+                "Referer": "https://faucet.testnet-1.testnet.allora.network/",
+                "Sec-Ch-Ua": "\"Not/A)Brand\";v=\"8\", \"Chromium\";v=\"126\", \"Google Chrome\";v=\"126\"",
+                "Sec-Ch-Ua-Mobile": "?0",
+                "Sec-Ch-Ua-Platform": "\"Windows\"",
+                "Sec-Fetch-Dest": "empty",
+                "Sec-Fetch-Mode": "cors",
+                "Sec-Fetch-Site": "same-origin"
             }
         });
         if (response.status === 200 && response.data.result.code === 0) {
             console.log(`Successfully claimed faucet for address: ${address}.Response: ${JSON.stringify(response.data)}`);
-            fs.appendFileSync(successPath, address+"\n", 'utf8');
+            fs.appendFileSync(successPath, address + "\n", 'utf8');
             return true
-        }else if (response.status === 200 && response.data.result.code === 429) {
+        } else if (response.status === 200 && response.data.result.code === 429) {
             console.log(`error claimed faucet for address: ${address}.Response: ${JSON.stringify(response.data)}`);
-        }
-        else {
+        } else {
             console.error(`Failed to claim faucet for address: ${address}. Response: ${JSON.stringify(response.data)}`);
         }
     } catch (error) {
@@ -79,14 +93,14 @@ function sleep(ms) {
 // Function to read addresses from file and claim faucet
 async function processAddresses(file) {
     try {
-        const addresses = fs.readFileSync(file, { encoding: 'utf-8' }).split('\n').map(a => a.trim()).filter(Boolean);
-        const successAddresses = fs.readFileSync(successPath, { encoding: 'utf-8' }).split('\n').map(a => a.trim()).filter(Boolean);
-        if (addresses.length === successAddresses.length){
+        const addresses = fs.readFileSync(file, {encoding: 'utf-8'}).split('\n').map(a => a.trim()).filter(Boolean);
+        const successAddresses = fs.readFileSync(successPath, {encoding: 'utf-8'}).split('\n').map(a => a.trim()).filter(Boolean);
+        if (addresses.length === successAddresses.length) {
             console.log("已经全跑好了")
             return
         }
         for (const address of addresses) {
-            if(successAddresses.indexOf(address)!==-1){
+            if (successAddresses.indexOf(address) !== -1) {
                 console.log(`这个地址已经成功领水，不用跑了:${address}`)
             }
             if (address) { // Ensure address is not empty
@@ -94,8 +108,8 @@ async function processAddresses(file) {
                 // let many = false;
                 // while (!success){
                 //     success = await claimFaucet(address);
-                    await claimFaucet(address);
-                    await  sleep(1000)
+                await claimFaucet(address);
+                await sleep(1000)
                 // }
             }
         }
@@ -115,5 +129,4 @@ if (!fileName) {
 // const filePath = path.resolve(__dirname, fileName);
 
 processAddresses(fileName);
-
 

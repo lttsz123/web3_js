@@ -101,6 +101,7 @@ async function processAddresses(file) {
         for (const address of addresses) {
             if (successAddresses.indexOf(address) !== -1) {
                 console.log(`这个地址已经成功领水，不用跑了:${address}`)
+                continue
             }
             if (address) { // Ensure address is not empty
                 // let success = false

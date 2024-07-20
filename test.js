@@ -93,10 +93,10 @@ async function processAddresses(file) {
     try {
         const addresses = fs.readFileSync(file, {encoding: 'utf-8'}).split('\n').map(a => a.trim()).filter(Boolean);
         const successAddresses = fs.readFileSync(successPath, {encoding: 'utf-8'}).split('\n').map(a => a.trim()).filter(Boolean);
-        if (addresses.length === successAddresses.length) {
-            console.log("已经全跑好了")
-            return
-        }
+        // if (addresses.length === successAddresses.length) {
+        //     console.log("已经全跑好了")
+        //     return
+        // }
         for (const address of addresses) {
             if (successAddresses.indexOf(address) !== -1) {
                 console.log(`这个地址已经成功领水，不用跑了:${address}`)

@@ -63,7 +63,7 @@ async function claimFaucet(address) {
                 "Sec-Fetch-Site": "same-origin"
             }
         });
-        if (response.status === 200 && response.data.result.code === 0) {
+        if (response.status === 200 && response.data.message === address) {
             console.log(`Successfully claimed faucet for address: ${address}.Response: ${JSON.stringify(response.data)}`);
             fs.appendFileSync(successPath, address + "\n", 'utf8');
             return true

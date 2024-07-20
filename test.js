@@ -64,7 +64,7 @@ async function claimFaucet(address) {
             }
         });
         console.log(response.data)
-        if (response.status === 200 && response.data.recipient === address) {
+        if (response.status === 200 && response.data.message === 'Faucet processing request') {
             console.log(`Successfully claimed faucet for address: ${address}.Response: ${JSON.stringify(response.data)}`);
             fs.appendFileSync(successPath, address + "\n", 'utf8');
             return true

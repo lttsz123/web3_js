@@ -80,6 +80,7 @@ async function claimFaucet(address) {
             console.log(error.response.data)
             if(error.response.data.message==='Address has already received faucet'){
                 console.log("success ...,already get")
+                fs.appendFileSync(successPath, address + "\n", 'utf8');
                 return true;
             }
         } else if (error.request) {

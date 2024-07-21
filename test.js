@@ -64,11 +64,12 @@ async function claimFaucet(address) {
             }
         });
         console.log(response.status)
-        if (response.status === 200 && response.data.message === 'Faucet processing request') {
+        console.log(response.data)
+        if (response.status === 200 && response.data.code === 0) {
             console.log(`Successfully claimed faucet for address: ${address}.Response: ${JSON.stringify(response.data)}`);
             fs.appendFileSync(successPath, address + "\n", 'utf8');
             return true
-        } else if (response.status === 200 && response.data.result.code === 429) {
+        } else if (response.status === 200 && response.data.code === 429) {
             console.log(`error claimed faucet for address: ${address}.Response: ${JSON.stringify(response.data)}`);
         } else {
             console.error(`Failed to claim faucet for address: ${address}. Response: ${JSON.stringify(response.data)}`);

@@ -79,6 +79,7 @@ async function claimFaucet(address) {
             console.error(`Request failed with status code ${error.response.status} for address: ${address}`);
             console.log(error.response.data)
             if(error.response.data.message==='Address has already received faucet'){
+                console.log("success ...,already get")
                 return true;
             }
         } else if (error.request) {

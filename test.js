@@ -75,6 +75,7 @@ async function claimFaucet(address) {
             console.error(`Failed to claim faucet for address: ${address}. Response: ${JSON.stringify(response.data)}`);
         }
     } catch (error) {
+        console.log(error)
         if (error.response) {
             console.error(`Request failed with status code ${error.response.status} for address: ${address}`);
             console.log(error.response.data)

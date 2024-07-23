@@ -4,7 +4,7 @@ const fs = require('fs');
 const path = require('path');
 const successPath = "success.txt"
 // Faucet API endpoint
-const FAUCET_URL = 'https://faucet.testnet-1.testnet.allora.network/send/allora-testnet-1/';
+const FAUCET_URL = 'https://faucet.testnet-1.testnet.allora.network/send/';
 
 // Confirm axios-retry is loaded
 console.log(`axiosRetry loaded: ${typeof axiosRetry === 'function'}`);

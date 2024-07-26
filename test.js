@@ -39,7 +39,7 @@ async function createTask() {
     const response = await axios.post(url, params);
     console.log(response.data)
     if (!response.data){
-        throw Error(`error captcha get task`);
+        return {}
     }
     return response.data;
 }
@@ -132,7 +132,7 @@ async function claimFaucet(address) {
             }
             console.error(`Request failed with status code ${error.response.status} for address: ${address}`);
         } else if (error.request) {
-            console.error(`No response received for address: ${address}`);
+            console.error(`No response received for address: ${address}:${error.request}`);
         } else {
             console.error(`Error claiming faucet for address: ${address}`, error.message);
         }

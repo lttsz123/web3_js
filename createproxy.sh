@@ -3,19 +3,26 @@
 # 安装Squid
 sudo apt update
 sudo apt install -y squid
-apt install -y htpasswd
+sudo apt install -y apache2-utils
 
-# 创建密码文件（如果尚不存在）
-# 注意：这里我们假设密码文件不存在，并直接使用htpasswd命令创建
-# 如果文件已存在，你可能需要手动处理或删除旧文件
-PASSWORD_FILE="/etc/squid/passwords"
-if [ ! -f "$PASSWORD_FILE" ]; then
-     htpasswd -c "$PASSWORD_FILE" your_username  
-    # 脚本运行到这里会暂停，等待你输入密码
-    # 如果你想自动化这个过程，你需要考虑将密码作为脚本输入的一部分（但这样做通常不推荐，因为存在安全风险）
-else
-    echo "Password file $PASSWORD_FILE already exists. Skipping creation."
-fi
+PASSWORD_FILE="/etc/squid/passwords"    
+USERNAME="your_username"  # 设置用户名  
+PASSWORD="abc"  # 设置密码  
+  
+if [ ! -f "$PASSWORD_FILE" ]; then  
+    # 使用echo和管道自动传递用户名和密码给htpasswd  
+    echo -e "$USERNAME:$PASSWORD" | sudo tee "$PASSWORD_FILE" > /dev/null  
+    # 更改密码文件的权限，确保只有root可以访问  
+    sudo chmod 600 "$PASSWORD_FILE"  
+    # 如果你的Squid使用htpasswd格式的密码文件，并且需要加密密码，  
+    # 你可能需要先手动运行一次htpasswd来创建加密的密码文件，  
+    # 然后用上面的方法替换文件中的密码（但这需要知道加密密码的格式）。  
+    # 另一个选择是使用专门的工具或脚本来加密密码，然后添加到文件中。  
+    # 注意：下面的命令假设你已经有了加密的密码  
+    # sudo htpasswd -b -c "$PASSWORD_FILE" "$USERNAME" "$ENCRYPTED_PASSWORD"  
+else  
+    echo "Password file $PASSWORD_FILE already exists. Skipping creation."    
+fi 
 
 # 编辑Squid配置文件以启用基本认证
 # 注意：这里我们使用sed命令来在配置文件中添加必要的行

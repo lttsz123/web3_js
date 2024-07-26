@@ -3,13 +3,14 @@
 # 安装Squid
 sudo apt update
 sudo apt install -y squid
+apt install -y htpasswd
 
 # 创建密码文件（如果尚不存在）
 # 注意：这里我们假设密码文件不存在，并直接使用htpasswd命令创建
 # 如果文件已存在，你可能需要手动处理或删除旧文件
 PASSWORD_FILE="/etc/squid/passwords"
 if [ ! -f "$PASSWORD_FILE" ]; then
-    read -p "$PASSWORD_FILE" your_username
+     htpasswd -c "$PASSWORD_FILE" your_username  
     # 脚本运行到这里会暂停，等待你输入密码
     # 如果你想自动化这个过程，你需要考虑将密码作为脚本输入的一部分（但这样做通常不推荐，因为存在安全风险）
 else

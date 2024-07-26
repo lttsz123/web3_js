@@ -44,3 +44,4 @@ http_access deny all' "$SQUID_CONF"
 sudo systemctl restart squid
 
 echo "Squid proxy server with basic authentication has been set up."
+ip addr show eth0 | grep inet | awk '{print $2}' | cut -d/ -f1

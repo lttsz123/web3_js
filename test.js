@@ -22,7 +22,7 @@ axiosRetry(axios, {
 });
 
 // Configure axios default timeout
-axios.defaults.timeout = 30000; // 30 seconds
+axios.defaults.timeout = 50000; // 30 seconds
 
 async function createTask() {
     const url = "https://tc.api.yescaptcha.com/createTask";
@@ -37,7 +37,7 @@ async function createTask() {
     };
 
     const response = await axios.post(url, params);
-    console.log(response.data)
+    // console.log(response.data)
     if (!response.data){
         return {"taskId":undefined}
     }
@@ -135,7 +135,7 @@ async function claimFaucet(address) {
             // console.log(error.response)
         } else if (error.request) {
             console.error(`No response received for address: ${address}:${error.request}`);
-            console.log(error.request)
+            // console.log(error.request)
         } else {
             console.error(`Error claiming faucet for address: ${address}`);
             // console.log(error.message)

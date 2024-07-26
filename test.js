@@ -58,8 +58,8 @@ async function getTaskResult(taskId) {
         return new Promise((resolve) => setTimeout(resolve, milliseconds));
     };
     await sleep(0.2);
-    console.log("get task result")
-    console.log(response.data)
+    // console.log("get task result")
+    // console.log(response.data)
     if (response.data.status === "ready") {
         return response.data;
     } else if (response.data.status === "processing") {
@@ -132,13 +132,13 @@ async function claimFaucet(address) {
                 return 429
             }
             console.error(`Request failed with status code ${error.response.status} for address: ${address}`);
-            console.log(error.response)
+            // console.log(error.response)
         } else if (error.request) {
             console.error(`No response received for address: ${address}:${error.request}`);
             console.log(error.request)
         } else {
             console.error(`Error claiming faucet for address: ${address}`);
-            console.log(error.message)
+            // console.log(error.message)
         }
     }
     return false

@@ -122,10 +122,11 @@ async function claimFaucet(address) {
         }
     } catch (error) {
         console.log(error.response)
-        if(error.response.status===429){
-            return 429
-        }
+
         if (error.response) {
+            if(error.response.status===429){
+                return 429
+            }
             console.error(`Request failed with status code ${error.response.status} for address: ${address}`);
         } else if (error.request) {
             console.error(`No response received for address: ${address}`);
@@ -149,14 +150,14 @@ async function processAddresses(file) {
         for (const address of addresses) {
             if(successAddresses.indexOf(address)!==-1){
                 console.log(`这个地址已经成功领水，不用跑了:${address}`)
-                continue;
+                continue
             }
             if (address) { // Ensure address is not empty
                 // let success = false
                 // let many = false;
                 // while (!success){
-                console.log(`开始领水:${address}`)
                 //     success = await claimFaucet(address);
+                console.log(`开始领水:${address}`)
                     let code = await claimFaucet(address);
                     if(code===429){
                         console.log("超过限制，退出。。。。")

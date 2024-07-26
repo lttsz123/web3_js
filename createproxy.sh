@@ -6,8 +6,8 @@ sudo apt install -y squid
 sudo apt install -y apache2-utils
 
 PASSWORD_FILE="/etc/squid/passwords"    
-USERNAME="your_username"  # 设置用户名  
-PASSWORD="abc"  # 设置密码  
+USERNAME="usermame"  # 设置用户名  
+PASSWORD="wlxsykd"  # 设置密码  
   
 if [ ! -f "$PASSWORD_FILE" ]; then  
     # 使用echo和管道自动传递用户名和密码给htpasswd  

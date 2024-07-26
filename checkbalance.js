@@ -30,17 +30,23 @@ async function processAddresses(file) {
                 await  axios.get(`https://allora-api.testnet-1.testnet.allora.network/cosmos/bank/v1beta1/balances/${address}`)
                     .then(response => {
                         const result = response.data;
-                        let myData = `${address}:${result.balances[0].amount}`
-                        console.log(myData)
-                        result_list.push(myData)
+                        try{
+                            let myData = `${address}:${result.balances[0].amount}`
+                            console.log(myData)
+                        }catch {
+                            result_list.push(address)
+                            console.log(response.data)
+                        }
+
                     })
                     .catch(error => {
                         console.error('Error fetching addresses:', error);
+
                     });
             }
         }
         const addressText = result_list.join('\n');
-        fs.writeFile('success_get.txt', addressText, err => {
+        fs.writeFile('not_balance.txt', addressText, err => {
             if (err) {
                 console.error('Error writing file:', err);
             } else {

@@ -126,17 +126,19 @@ async function claimFaucet(address) {
             console.error(`Failed to claim faucet for address: ${address}. Response: ${JSON.stringify(response.data)}`);
         }
     } catch (error) {
-        console.log(error.response)
-
+        console.log(`error.....`)
         if (error.response) {
             if(error.response.status===429){
                 return 429
             }
             console.error(`Request failed with status code ${error.response.status} for address: ${address}`);
+            console.log(error.response)
         } else if (error.request) {
             console.error(`No response received for address: ${address}:${error.request}`);
+            console.log(error.request)
         } else {
-            console.error(`Error claiming faucet for address: ${address}`, error.message);
+            console.error(`Error claiming faucet for address: ${address}`);
+            console.log(error.message)
         }
     }
     return false

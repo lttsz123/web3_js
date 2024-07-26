@@ -24,7 +24,7 @@ axiosRetry(axios, {
 // Configure axios default timeout
 axios.defaults.timeout = 20000; // 20 seconds
 
-async function createTask( pageAction) {
+async function createTask( cnt,pageAction) {
     const url = "https://tc.api.yescaptcha.com/createTask";
     const params = {
         clientKey: clientKey,
@@ -38,6 +38,13 @@ async function createTask( pageAction) {
 
     const response = await axios.post(url, params);
     console.log(response.data)
+    if (!response.data){
+        if(cnt<=5){
+            return createTask(cnt++)
+        }else{
+            throw Error(`error captcha get task`);
+        }
+    }
     return response.data;
 }
 
@@ -64,7 +71,7 @@ async function getTaskResult(taskId) {
 
 async function recaptcha() {
     console.log("创建任务:")
-    const {taskId} = await createTask();
+    const {taskId} = await createTask(0);
     console.log("获取任务id:"+taskId)
     if (!taskId) {
         console.log("获取验证码任务失败")

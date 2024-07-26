@@ -155,6 +155,7 @@ async function processAddresses(file) {
                 // let success = false
                 // let many = false;
                 // while (!success){
+                console.log(`开始领水:${address}`)
                 //     success = await claimFaucet(address);
                     let code = await claimFaucet(address);
                     if(code===429){

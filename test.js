@@ -5,29 +5,11 @@ const path = require('path');
 const successPath = "success.txt"
 // Faucet API endpoint
 const FAUCET_URL = 'https://faucet.testnet-1.testnet.allora.network/send/';
-
+const websiteUrl = "https://faucet.testnet-1.testnet.allora.network/"
+const websiteKey = '6LeWDBYqAAAAAIcTRXi4JLbAlu7mxlIdpHEZilyo'
+const taskType = "RecaptchaV2EnterpriseTaskProxyless"
 // Confirm axios-retry is loaded
 console.log(`axiosRetry loaded: ${typeof axiosRetry === 'function'}`);
-
-// 定义一个包含不同User-Agent的数组
-const userAgents = [
-    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36',
-    'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.54 Safari/537.36',
-    'Mozilla/5.0 (Macintosh; Intel Mac OS X 11_0_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.54 Safari/537.36',
-    'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.81 Safari/537.36',
-    'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:90.0) Gecko/20100101 Firefox/90.0',
-    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:89.0) Gecko/20100101 Firefox/89.0',
-    'Mozilla/5.0 (Linux; Android 11; Pixel 5 Build/RP1A.201005.004) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.54 Mobile Safari/537.36',
-    'Mozilla/5.0 (Linux; Android 10; SM-G986U Build/QP1A.190711.020; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/95.0.4638.54 Mobile Safari/537.36',
-    'Mozilla/5.0 (iPhone; CPU iPhone OS 14_7_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.3 Mobile/15E148 Safari/604.1',
-    'Mozilla/5.0 (iPad; CPU OS 14_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Mobile/15E148 Safari/604.1'
-];
-
-// 定义一个函数，用于随机选择一个User-Agent
-function getRandomUserAgent() {
-    return userAgents[Math.floor(Math.random() * userAgents.length)];
-}
-
 
 // Configure axios to retry failed requests using axios-retry
 axiosRetry(axios, {
@@ -42,48 +24,109 @@ axiosRetry(axios, {
 // Configure axios default timeout
 axios.defaults.timeout = 20000; // 20 seconds
 
+async function createTask( pageAction) {
+    const url = "https://tc.api.yescaptcha.com/createTask";
+    const params = {
+        clientKey: clientKey,
+        task: {
+            websiteURL: websiteUrl,
+            websiteKey: websiteKey,
+            type: taskType,
+        },
+        softID: clientKey,
+    };
+
+    const response = await axios.post(url, params);
+    console.log(response.data)
+    return response.data;
+}
+
+// 获取验证码结果
+async function getTaskResult(taskId) {
+    const url = "https://tc.api.yescaptcha.com/getTaskResult";
+    const params = {
+        clientKey: clientKey,
+        taskId: taskId,
+    };
+
+    const response = await axios.post(url, params);
+    const sleep = (minutes) => {
+        const milliseconds = minutes * 60 * 1000;
+        return new Promise((resolve) => setTimeout(resolve, milliseconds));
+    };
+    await sleep(0.2);
+    if (response.data.status === "ready") {
+        return response.data;
+    } else if (response.data.status === "processing") {
+        await getTaskResult(taskId);
+    }
+}
+
+async function recaptcha() {
+    console.log("创建任务:")
+    const {taskId} = await createTask();
+    console.log("获取任务id:"+taskId)
+    if (!taskId) {
+        console.log("获取验证码任务失败")
+        throw new Error(`error captcha`);
+    }
+    let result = await getTaskResult(taskId);
+    console.log("第一次获取结果:"+result)
+    // 如果result为空，等待6秒后再次请求
+    if (!result) {
+        await sleep(6);
+        result = await getTaskResult(taskId);
+        console.log("第二次获取结果:"+result)
+    }
+    if (!result) {
+        await sleep(6);
+        result = await getTaskResult(taskId);
+        console.log("第三次获取结果:"+result)
+    }
+    // 如果再次为空，抛出错误
+    if (!result) {
+        console.log("获取验证码失败")
+        throw new Error(`error captcha`);
+    }
+    // console.log(result)
+    const {gRecaptchaResponse} = result.solution;
+    console.log("获取验证码成功")
+    // console.log(gRecaptchaResponse)
+    return gRecaptchaResponse;
+}
+
+
 // Function to claim faucet tokens
 async function claimFaucet(address) {
     try {
-        const response = await axios.get(`${FAUCET_URL}${address}`, {
-            headers: {
-                'User-Agent': getRandomUserAgent(),
-                "authority": "faucet.testnet-1.testnet.allora.network",
-                "method": "GET",
-                "path": "/send/allora-testnet-1/fsdfsdf",
-                "scheme": "https",
-                "Accept": "*/*",
-                "Accept-Encoding": "gzip, deflate, br, zstd",
-                "Accept-Language": "zh-CN,zh;q=0.9",
-                "Priority": "u=1, i",
-                "Referer": "https://faucet.testnet-1.testnet.allora.network/",
-
-                "Sec-Fetch-Dest": "empty",
-                "Sec-Fetch-Mode": "cors",
-                "Sec-Fetch-Site": "same-origin"
-            }
+        const token = await recaptcha()
+        const response = await axios.post(`${FAUCET_URL}`,{
+            "chain": "allora-testnet-1",
+            "address": address,
+            "recapcha_token":token
         });
-        console.log(response.status)
         console.log(response.data)
-        if (response.status === 200 && response.data.code === 0) {
+        console.log(response.status)
+        if(response.status===429 || response.data.code === 429){
+            return 429
+        }
+        if (response.status === 201 && response.data.message && response.data.message === 'Address enqueued for faucet processing.') {
             console.log(`Successfully claimed faucet for address: ${address}.Response: ${JSON.stringify(response.data)}`);
-            fs.appendFileSync(successPath, address + "\n", 'utf8');
+            fs.appendFileSync(successPath, address+"\n", 'utf8');
             return true
-        } else if (response.status === 200 && response.data.code === 429) {
+        }else if (response.status === 200 && response.data.code === 429) {
             console.log(`error claimed faucet for address: ${address}.Response: ${JSON.stringify(response.data)}`);
-        } else {
+        }
+        else {
             console.error(`Failed to claim faucet for address: ${address}. Response: ${JSON.stringify(response.data)}`);
         }
     } catch (error) {
-        console.log(error)
+        console.log(error.response)
+        if(error.response.status===429){
+            return 429
+        }
         if (error.response) {
             console.error(`Request failed with status code ${error.response.status} for address: ${address}`);
-            console.log(error.response.data)
-            if(error.response.data.message==='Address has already received faucet'){
-                console.log("success ...,already get")
-                fs.appendFileSync(successPath, address + "\n", 'utf8');
-                return true;
-            }
         } else if (error.request) {
             console.error(`No response received for address: ${address}`);
         } else {
@@ -100,24 +143,24 @@ function sleep(ms) {
 // Function to read addresses from file and claim faucet
 async function processAddresses(file) {
     try {
-        const addresses = fs.readFileSync(file, {encoding: 'utf-8'}).split('\n').map(a => a.trim()).filter(Boolean);
-        const successAddresses = fs.readFileSync(successPath, {encoding: 'utf-8'}).split('\n').map(a => a.trim()).filter(Boolean);
-        // if (addresses.length === successAddresses.length) {
-        //     console.log("已经全跑好了")
-        //     return
-        // }
+        const addresses = fs.readFileSync(file, { encoding: 'utf-8' }).split('\n').map(a => a.trim()).filter(Boolean);
+        const successAddresses = fs.readFileSync(successPath, { encoding: 'utf-8' }).split('\n').map(a => a.trim()).filter(Boolean);
+
         for (const address of addresses) {
-            if (successAddresses.indexOf(address) !== -1) {
+            if(successAddresses.indexOf(address)!==-1){
                 console.log(`这个地址已经成功领水，不用跑了:${address}`)
-                continue
             }
             if (address) { // Ensure address is not empty
                 // let success = false
                 // let many = false;
                 // while (!success){
                 //     success = await claimFaucet(address);
-                await claimFaucet(address);
-                await sleep(1000)
+                    let code = await claimFaucet(address);
+                    if(code===429){
+                        console.log("超过限制，退出。。。。")
+                        break
+                    }
+                    // await  sleep(1000)
                 // }
             }
         }
@@ -128,8 +171,13 @@ async function processAddresses(file) {
 
 // // Get the file name from command line arguments
 const fileName = process.argv[2];
+const clientKey = process.argv[3];
 if (!fileName) {
     console.log('Please provide a file name.');
+    process.exit(1);
+}
+if (!clientKey) {
+    console.log('Please provide a clientKey.');
     process.exit(1);
 }
 //

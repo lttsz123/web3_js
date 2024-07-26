@@ -9,7 +9,7 @@ sudo apt install -y squid
 # 如果文件已存在，你可能需要手动处理或删除旧文件
 PASSWORD_FILE="/etc/squid/passwords"
 if [ ! -f "$PASSWORD_FILE" ]; then
-    sudo htpasswd -c "$PASSWORD_FILE" your_username
+    read -p "$PASSWORD_FILE" your_username
     # 脚本运行到这里会暂停，等待你输入密码
     # 如果你想自动化这个过程，你需要考虑将密码作为脚本输入的一部分（但这样做通常不推荐，因为存在安全风险）
 else

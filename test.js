@@ -22,7 +22,7 @@ axiosRetry(axios, {
 });
 
 // Configure axios default timeout
-axios.defaults.timeout = 20000; // 20 seconds
+axios.defaults.timeout = 30000; // 30 seconds
 
 async function createTask() {
     const url = "https://tc.api.yescaptcha.com/createTask";
@@ -39,7 +39,7 @@ async function createTask() {
     const response = await axios.post(url, params);
     console.log(response.data)
     if (!response.data){
-        return {}
+        return {"taskId":undefined}
     }
     return response.data;
 }
@@ -58,6 +58,8 @@ async function getTaskResult(taskId) {
         return new Promise((resolve) => setTimeout(resolve, milliseconds));
     };
     await sleep(0.2);
+    console.log("get task result")
+    console.log(response.data)
     if (response.data.status === "ready") {
         return response.data;
     } else if (response.data.status === "processing") {

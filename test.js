@@ -8,6 +8,27 @@ const FAUCET_URL = 'https://faucet.testnet-1.testnet.allora.network/send/';
 const websiteUrl = "https://faucet.testnet-1.testnet.allora.network/"
 const websiteKey = '6LeWDBYqAAAAAIcTRXi4JLbAlu7mxlIdpHEZilyo'
 const taskType = "RecaptchaV2EnterpriseTaskProxyless"
+const headers = {
+    ':authority': 'faucet.testnet-1.testnet.allora.network',
+    ':method': 'POST',
+    ':path': '/send',
+    ':scheme': 'https',
+    'Accept': '*/*',
+    'Accept-Encoding': 'gzip, deflate, br, zstd',
+    'Accept-Language': 'zh-CN,zh;q=0.9',
+    'Content-Length': '2380', // 注意：这个值通常是由axios自动设置的，除非你有特殊需求
+    'Content-Type': 'application/json',
+    'Origin': 'https://faucet.testnet-1.testnet.allora.network',
+    'Priority': 'u=1, i',
+    'Referer': 'https://faucet.testnet-1.testnet.allora.network/',
+    'Sec-Ch-Ua': '"Not/A)Brand";v="8", "Chromium";v="126", "Google Chrome";v="126"',
+    'Sec-Ch-Ua-Mobile': '?0',
+    'Sec-Ch-Ua-Platform': '"Windows"',
+    'Sec-Fetch-Dest': 'empty',
+    'Sec-Fetch-Mode': 'cors',
+    'Sec-Fetch-Site': 'same-origin',
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36'
+};
 // Confirm axios-retry is loaded
 console.log(`axiosRetry loaded: ${typeof axiosRetry === 'function'}`);
 
@@ -23,7 +44,7 @@ axiosRetry(axios, {
 
 // Configure axios default timeout
 axios.defaults.timeout = 50000; // 30 seconds
-
+// process.env.HTTPS_PROXY = 'http://127.0.0.1:10809';
 async function createTask() {
     const url = "https://tc.api.yescaptcha.com/createTask";
     const params = {
@@ -109,10 +130,13 @@ async function claimFaucet(address) {
             "chain": "allora-testnet-1",
             "address": address,
             "recapcha_token":token
+        },{
+            headers: headers
         });
         console.log(response.data)
         console.log(response.status)
         if(response.status===429 || response.data.code === 429){
+
             return 429
         }
         if (response.status === 201 && response.data.message && response.data.message === 'Address enqueued for faucet processing.') {
@@ -128,10 +152,18 @@ async function claimFaucet(address) {
     } catch (error) {
         console.log(`error.....`)
         if (error.response) {
-            if(error.response.status===429){
+            if(error.response.data){
+                console.log(error.response.data.message)
+            }
+            if(error.response.status===429 ){
+                if(error.response.data.message.indexOf(address)!==-1){
+                    return 0
+                }
+                console.log(error.response)
                 return 429
             }
             console.error(`Request failed with status code ${error.response.status} for address: ${address}`);
+
             // console.log(error.response)
         } else if (error.request) {
             console.error(`No response received for address: ${address}:${error.request}`);
@@ -166,10 +198,10 @@ async function processAddresses(file) {
                 //     success = await claimFaucet(address);
                 console.log(`开始领水:${address}`)
                     let code = await claimFaucet(address);
-                    if(code===429){
-                        console.log("超过限制，退出。。。。")
-                        break
-                    }
+                    // if(code===429){
+                    //     console.log("超过限制，退出。。。。")
+                    //     break
+                    // }
                     // await  sleep(1000)
                 // }
             }

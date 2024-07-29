@@ -8,22 +8,18 @@ const FAUCET_URL = 'https://faucet.testnet-1.testnet.allora.network/send/';
 const websiteUrl = "https://faucet.testnet-1.testnet.allora.network/"
 const websiteKey = '6LeWDBYqAAAAAIcTRXi4JLbAlu7mxlIdpHEZilyo'
 const taskType = "RecaptchaV2EnterpriseTaskProxyless"
-const headers = {
-    'Accept': '*/*',
-    'Accept-Encoding': 'gzip, deflate, br, zstd',
-    'Accept-Language': 'zh-CN,zh;q=0.9',
-    'Content-Type': 'application/json',
-    'Origin': 'https://faucet.testnet-1.testnet.allora.network',
-    'Priority': 'u=1, i',
-    'Referer': 'https://faucet.testnet-1.testnet.allora.network/',
-    'Sec-Ch-Ua': '"Not/A)Brand";v="8", "Chromium";v="126", "Google Chrome";v="126"',
-    'Sec-Ch-Ua-Mobile': '?0',
-    'Sec-Ch-Ua-Platform': '"Windows"',
-    'Sec-Fetch-Dest': 'empty',
-    'Sec-Fetch-Mode': 'cors',
-    'Sec-Fetch-Site': 'same-origin',
-    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36'
-};
+const userAgents = [
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.45 Safari/537.36",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.81 Safari/537.36",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.63 Safari/537.36",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.159 Safari/537.36",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.212 Safari/537.36",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.190 Safari/537.36",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36"
+];
 // Confirm axios-retry is loaded
 console.log(`axiosRetry loaded: ${typeof axiosRetry === 'function'}`);
 
@@ -40,6 +36,12 @@ axiosRetry(axios, {
 // Configure axios default timeout
 axios.defaults.timeout = 50000; // 30 seconds
 // process.env.HTTPS_PROXY = 'http://127.0.0.1:10809';
+function getRandomUserAgent() {
+    // 生成一个随机索引
+    const index = Math.floor(Math.random() * userAgents.length);
+    // 返回对应的User-Agent
+    return userAgents[index];
+}
 async function createTask() {
     const url = "https://tc.api.yescaptcha.com/createTask";
     const params = {
@@ -126,7 +128,22 @@ async function claimFaucet(address) {
             "address": address,
             "recapcha_token":token
         },{
-            headers: headers
+            headers:  {
+                'Accept': '*/*',
+                'Accept-Encoding': 'gzip, deflate, br, zstd',
+                'Accept-Language': 'zh-CN,zh;q=0.9',
+                'Content-Type': 'application/json',
+                'Origin': 'https://faucet.testnet-1.testnet.allora.network',
+                'Priority': 'u=1, i',
+                'Referer': 'https://faucet.testnet-1.testnet.allora.network/',
+                'Sec-Ch-Ua': '"Not/A)Brand";v="8", "Chromium";v="126", "Google Chrome";v="126"',
+                'Sec-Ch-Ua-Mobile': '?0',
+                'Sec-Ch-Ua-Platform': '"Windows"',
+                'Sec-Fetch-Dest': 'empty',
+                'Sec-Fetch-Mode': 'cors',
+                'Sec-Fetch-Site': 'same-origin',
+                'User-Agent': getRandomUserAgent()
+            }
         });
         console.log(response.data)
         console.log(response.status)

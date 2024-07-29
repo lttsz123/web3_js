@@ -9,14 +9,9 @@ const websiteUrl = "https://faucet.testnet-1.testnet.allora.network/"
 const websiteKey = '6LeWDBYqAAAAAIcTRXi4JLbAlu7mxlIdpHEZilyo'
 const taskType = "RecaptchaV2EnterpriseTaskProxyless"
 const headers = {
-    ':authority': 'faucet.testnet-1.testnet.allora.network',
-    ':method': 'POST',
-    ':path': '/send',
-    ':scheme': 'https',
     'Accept': '*/*',
     'Accept-Encoding': 'gzip, deflate, br, zstd',
     'Accept-Language': 'zh-CN,zh;q=0.9',
-    'Content-Length': '2380', // 注意：这个值通常是由axios自动设置的，除非你有特殊需求
     'Content-Type': 'application/json',
     'Origin': 'https://faucet.testnet-1.testnet.allora.network',
     'Priority': 'u=1, i',
@@ -170,7 +165,7 @@ async function claimFaucet(address) {
             // console.log(error.request)
         } else {
             console.error(`Error claiming faucet for address: ${address}`);
-            // console.log(error.message)
+            console.log(error)
         }
     }
     return false

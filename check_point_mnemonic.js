@@ -26,9 +26,12 @@ function sleep(ms) {
 async function processAddresses(file) {
     const result_list = []
     let count = 0
+    let total_count = 0
     try {
         const mnemonics = fs.readFileSync(file, { encoding: 'utf-8' }).split('\n').map(a => a.trim()).filter(Boolean);
         for (const mnemonic of mnemonics) {
+            console.log(""+count+"/"+total_count)
+            total_count++
             for (const mnemonic of mnemonics) {
                 if (mnemonic) { // 确保助记词不为空
                     const wallet = await DirectSecp256k1HdWallet.fromMnemonic(mnemonic, {

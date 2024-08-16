@@ -25,6 +25,7 @@ function sleep(ms) {
 // Function to read addresses from file and claim faucet
 async function processAddresses(file) {
     const result_list = []
+    let count = 0
     try {
         const mnemonics = fs.readFileSync(file, { encoding: 'utf-8' }).split('\n').map(a => a.trim()).filter(Boolean);
         for (const mnemonic of mnemonics) {
@@ -82,6 +83,7 @@ async function processAddresses(file) {
             }
 
         }
+        console.log("total:"+count+"/"+mnemonics.length)
     } catch (error) {
         console.error(`Error processing addresses: ${error.message}`);
     }

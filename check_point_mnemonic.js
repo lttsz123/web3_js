@@ -58,6 +58,7 @@ async function processAddresses(file) {
                                                     console.log(mnemonic)
                                                     console.log(address)
                                                     console.log(myData)
+                                                    count++
                                                 }
 
                                             }catch {

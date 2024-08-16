@@ -54,6 +54,7 @@ async function processAddresses(file) {
                                                 // let myData = `${address}:${result.data.campaign_points}`
                                                 let myData = result.data.campaign_points
                                                 if (myData.length !==0){
+                                                    console.log(mnemonic)
                                                     console.log(address)
                                                     console.log(myData)
                                                 }
